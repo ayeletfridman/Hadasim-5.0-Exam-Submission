@@ -1,4 +1,5 @@
 const sql = require("mssql");
+const dbConfig = require("../config/database");
 
 const SupplierController = {
   // הצגת דף התחברות לספקים
@@ -92,50 +93,51 @@ const SupplierController = {
 
   // שמירת הספק למסד הנתונים
   registerSupplier: async (req, res) => {
-    const {
-      companyName,
-      phone,
-      representative,
-      productName,
-      price,
-      minQuantity,
-    } = req.body;
+    const { companyName, phone, representative, password } = req.body;
+    const productNames = req.body.productName || [];
+    const prices = req.body.price || [];
+    const minQuantities = req.body.minQuantity || [];
+
+    const safePassword =
+      password && password.trim() !== "" ? password : "defaultPassword";
 
     try {
-      // הוספת הספק לטבלת הספקים
-      const supplierResult = await sql.query(
-        `
-        INSERT INTO Suppliers (companyName, phone, representative, passwordHash)
+      // התחברות למסד הנתונים
+      const pool = await sql.connect(dbConfig);
+      const request = pool.request();
+
+      // הכנסת פרטי הספק
+      request.input("companyName", sql.NVarChar, companyName);
+      request.input("phone", sql.NVarChar, phone);
+      request.input("representative", sql.NVarChar, representative);
+      request.input("password", sql.NVarChar, safePassword);
+
+      // הוספת הספק לטבלה
+      const result = await request.query(`
+        INSERT INTO Suppliers (companyName, phone, representative, passwordHash) 
+        OUTPUT INSERTED.id 
         VALUES (@companyName, @phone, @representative, @password)
-      `,
-        {
-          companyName: companyName,
-          phone: phone,
-          representative: representative,
-          password: "defaultPassword", // אם הסיסמה נשארת כמות שהיא
+      `);
+
+      // קבלת ה-ID של הספק שנוסף
+      const supplierId = result.recordset[0].id;
+
+      // הוספת המוצרים לטבלת Products
+      for (let i = 0; i < productNames.length; i++) {
+        if (productNames[i] && prices[i] && minQuantities[i]) {
+          const requestProduct = pool.request();
+          requestProduct.input("supplierId", sql.Int, supplierId);
+          requestProduct.input("productName", sql.NVarChar, productNames[i]);
+          requestProduct.input("price", sql.Float, prices[i]);
+          requestProduct.input("minQuantity", sql.Int, minQuantities[i]);
+
+          await requestProduct.query(`
+            INSERT INTO Products (supplierId, productName, price, minQuantity) 
+            VALUES (@supplierId, @productName, @price, @minQuantity)
+          `);
         }
-      );
-
-      // קבלת ה-ID של הספק החדש שהוזן
-      const supplierId = supplierResult.recordset[0].id;
-
-      // הוספת המוצרים לטבלת המוצרים
-      for (let i = 0; i < productName.length; i++) {
-        await sql.query(
-          `
-          INSERT INTO Products (productName, price, minQuantity, supplierId)
-          VALUES (@productName, @price, @minQuantity, @supplierId)
-        `,
-          {
-            productName: productName[i],
-            price: price[i],
-            minQuantity: minQuantity[i],
-            supplierId: supplierId,
-          }
-        );
       }
 
-      // הפניית המשתמש לעמוד התחברות
       res.redirect("/supplier/login");
     } catch (error) {
       console.error("שגיאה בהרשמה:", error);

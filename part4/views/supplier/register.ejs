@@ -4,12 +4,11 @@
   <input type="text" name="phone" placeholder="מספר טלפון" required />
   <input type="text" name="representative" placeholder="שם נציג" required />
 
-  <!-- מידע על המוצר -->
-  <h3>הוסף מוצרים:</h3>
-  <div id="product-container">
+  <h3>רשימת מוצרים</h3>
+  <div id="products-container">
     <div class="product">
       <input type="text" name="productName[]" placeholder="שם מוצר" required />
-      <input type="number" name="price[]" placeholder="מחיר מוצר" required />
+      <input type="number" name="price[]" placeholder="מחיר" required />
       <input
         type="number"
         name="minQuantity[]"
@@ -18,6 +17,21 @@
       />
     </div>
   </div>
+  <button type="button" onclick="addProduct()">+</button>
 
   <button type="submit">הרשמה</button>
 </form>
+
+<script>
+  function addProduct() {
+    const container = document.getElementById("products-container");
+    const div = document.createElement("div");
+    div.classList.add("product");
+    div.innerHTML = `
+      <input type="text" name="productName[]" placeholder="שם מוצר" required />
+      <input type="number" name="price[]" placeholder="מחיר" required />
+      <input type="number" name="minQuantity[]" placeholder="כמות מינימלית" required />
+    `;
+    container.appendChild(div);
+  }
+</script>
