@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>דשבורד ספק</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>ברוך הבא לדשבורד הספק</h1>
+
+      <p>שלום חברת <strong><%= companyName %></strong>!</p>
+
+      <div class="actions">
+        <form action="/supplier/orders" method="GET">
+          <input type="hidden" name="supplierId" value="<%= supplierId %>" />
+          <input type="hidden" name="companyName" value="<%= companyName %>" />
+          <button type="submit" class="navigate">הצג את ההזמנות שלי</button>
+        </form>
+      </div>
+
+      <form action="/" method="GET">
+        <button type="submit">התנתק</button>
+      </form>
+    </div>
+  </body>
+</html>

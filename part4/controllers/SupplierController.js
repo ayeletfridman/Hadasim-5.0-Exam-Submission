@@ -4,62 +4,88 @@ const dbConfig = require("../config/database");
 const SupplierController = {
   // הצגת דף התחברות לספקים
   showLoginPage: (req, res) => {
-    res.render("supplier/login");
+    res.render("supplier/login", { error: null });
   },
 
   // התחברות ספק
   login: async (req, res) => {
-    const { companyName, password } = req.body;
+    const { companyName, phone } = req.body;
 
     try {
-      // יצירת בקשת SQL
       const request = new sql.Request();
-
-      // הוספת פרמטר לשאילתה
       request.input("companyName", sql.NVarChar, companyName);
 
-      // ביצוע השאילתה
       const result = await request.query(
         "SELECT * FROM Suppliers WHERE companyName = @companyName"
       );
 
       if (result.recordset.length === 0) {
-        return res.status(404).send("ספק לא נמצא");
+        // ספק לא נמצא → החזרה עם שגיאה
+        // return res.render("supplier/login", {
+        //   error: "החברה לא נמצאה." || null,
+        // });
+        res.render("supplier/login", { error: "חברה לא נמצאה, נסה שוב." });
       }
 
       const supplier = result.recordset[0];
 
-      // אם הסיסמה תואמת, ממשיכים
-      if (supplier.passwordHash === password) {
-        return res.send(`התחברת בהצלחה כחברה: ${companyName}`);
+      if (supplier.phone === phone) {
+        // התחברות מוצלחת
+        return res.render("supplier/dashboard", {
+          companyName: supplier.companyName,
+          supplierId: supplier.id,
+        });
       } else {
-        return res.status(401).send("סיסמה לא נכונה");
+        // טלפון לא תואם → החזרה עם שגיאה
+        // return res.render("supplier/login", {
+        //   error: "מספר הטלפון שגוי. נסה שוב.",
+        // });
+        res.render("supplier/login", { error: "מספר טלפון שגוי, נסה שוב." });
       }
     } catch (error) {
       console.error("שגיאה בהתחברות:", error);
       res.status(500).send("שגיאה בהתחברות");
+      //   return res.render("supplier/login", {
+      //     error: "אירעה שגיאה בעת ההתחברות. נסה שוב מאוחר יותר.",
+      //   });
     }
   },
 
   // הצגת רשימת ההזמנות של הספק
   viewOrders: async (req, res) => {
-    const { companyName } = req.query;
+    const { supplierId } = req.query;
+    console.log("supplierId from req.query:", supplierId);
 
     try {
+      // התחברות למסד הנתונים
+      const pool = await sql.connect(dbConfig);
+      const request = pool.request();
+
+      // הוספת המשתנה supplierId לשאילתה
+      request.input("supplierId", sql.Int, supplierId);
+
       // שליפת ההזמנות של הספק
-      const result = await sql.query(
-        `
-        SELECT * FROM Orders WHERE supplierName = @companyName
-      `,
-        { companyName: companyName }
-      );
+      const result = await request.query(`
+        SELECT 
+          Orders.*, 
+          Products.productName 
+        FROM 
+          Orders 
+        JOIN 
+          Products ON Orders.productId = Products.productId
+        WHERE 
+          Orders.supplierId = @supplierId
+      `);
 
       if (result.recordset.length === 0) {
         return res.send("אין הזמנות לספק הזה.");
       }
 
       // הצגת ההזמנות
-      res.json(result.recordset);
+      res.render("supplier/orders", {
+        orders: result.recordset,
+        companyName: req.query.companyName,
+      });
     } catch (error) {
       console.error("שגיאה בשליפת הזמנות:", error);
       res.status(500).send("שגיאה בשליפת הזמנות");
@@ -93,13 +119,13 @@ const SupplierController = {
 
   // שמירת הספק למסד הנתונים
   registerSupplier: async (req, res) => {
-    const { companyName, phone, representative, password } = req.body;
+    const { companyName, phone, representative } = req.body;
     const productNames = req.body.productName || [];
     const prices = req.body.price || [];
     const minQuantities = req.body.minQuantity || [];
 
-    const safePassword =
-      password && password.trim() !== "" ? password : "defaultPassword";
+    //const safePassword =
+    //  password && password.trim() !== "" ? password : "defaultPassword";
 
     try {
       // התחברות למסד הנתונים
@@ -110,13 +136,13 @@ const SupplierController = {
       request.input("companyName", sql.NVarChar, companyName);
       request.input("phone", sql.NVarChar, phone);
       request.input("representative", sql.NVarChar, representative);
-      request.input("password", sql.NVarChar, safePassword);
+      //request.input("password", sql.NVarChar, safePassword);
 
       // הוספת הספק לטבלה
       const result = await request.query(`
-        INSERT INTO Suppliers (companyName, phone, representative, passwordHash) 
+        INSERT INTO Suppliers (companyName, phone, representative) 
         OUTPUT INSERTED.id 
-        VALUES (@companyName, @phone, @representative, @password)
+        VALUES (@companyName, @phone, @representative)
       `);
 
       // קבלת ה-ID של הספק שנוסף

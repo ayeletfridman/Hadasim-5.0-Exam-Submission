@@ -1,44 +1,28 @@
 const express = require("express");
 const router = express.Router();
-const sql = require("mssql");
-const bcrypt = require("bcrypt");
-const { sqlConfig } = require("../config/database");
+const ownerController = require("../controllers/ownerController");
 
-// דף התחברות - הצגת הטופס
-router.get("/login", (req, res) => {
-  res.render("owner/login");
-});
+// טופס התחברות
+router.get("/login", ownerController.loginPage);
 
-// התחברות - אימות פרטי בעל המכולת
-router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+// שליחת התחברות
+router.post("/login", ownerController.login);
 
-  try {
-    let pool = await sql.connect(sqlConfig);
-    let result = await pool
-      .request()
-      .input("username", sql.NVarChar, username)
-      .query("SELECT * FROM Owners WHERE username = @username");
+// דשבורד אחרי התחברות
+router.get("/dashboard", ownerController.dashboard);
 
-    if (result.recordset.length === 0) {
-      return res.send("❌ שם משתמש לא קיים");
-    }
+// הצגת דף הזמנה
+router.get("/order", ownerController.showOrderPage);
 
-    let owner = result.recordset[0];
+// יצירת הזמנה
+router.post("/order", ownerController.createOrder);
 
-    // השוואת סיסמה עם הסיסמה המוצפנת מהמסד נתונים
-    const isMatch = await bcrypt.compare(password, owner.password);
-    if (!isMatch) {
-      return res.send("❌ סיסמה שגויה");
-    }
+router.get("/products", ownerController.getProductsForSupplier); // כאן אנחנו שולחים את הפונקציה של הקונטרולר
 
-    // שמירת מזהה המשתמש בסשן
-    req.session.ownerId = owner.id;
-    res.redirect("/owner/orders"); // מעבר לרשימת ההזמנות
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("❌ שגיאה בשרת");
-  }
-});
+// נתיב לצפייה בכל ההזמנות
+router.get("/orders", ownerController.showAllOrders);
+
+// נתיב לעדכון סטטוס של הזמנה להושלמה
+router.post("/orders/complete/:orderId", ownerController.markOrderAsCompleted);
 
 module.exports = router;

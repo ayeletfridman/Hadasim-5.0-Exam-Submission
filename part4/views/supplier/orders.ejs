@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>הזמנות הספק</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h1>ההזמנות של ספק <%= companyName %></h1>
+
+    <% if (orders.length === 0) { %>
+    <p>אין הזמנות לספק הזה.</p>
+    <% } else { %>
+    <table>
+      <thead>
+        <tr>
+          <th>מספר הזמנה</th>
+          <th>סטטוס</th>
+          <th>תאריך</th>
+          <th>כמות</th>
+          <th>מוצר</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(order => { %>
+        <tr>
+          <td><%= order.id %></td>
+          <td><%= order.status %></td>
+          <td><%= order.orderDate %></td>
+          <td><%= order.quantity %></td>
+          <td><%= order.productName %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } %>
+
+    <a href="/supplier/dashboard">חזור לדשבורד</a>
+  </body>
+</html>

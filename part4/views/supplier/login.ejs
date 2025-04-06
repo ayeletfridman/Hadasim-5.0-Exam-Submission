@@ -1,8 +1,22 @@
-<h2>כניסת ספק</h2>
-<form action="/supplier/login" method="POST">
-  <input type="text" name="companyName" placeholder="שם חברה" required />
-  <input type="password" name="password" placeholder="סיסמה" required />
-  <button type="submit">התחבר</button>
-</form>
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>כניסת ספק</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h2>כניסת ספק</h2>
 
-<p>אין לך חשבון? <a href="/supplier/register">לחץ כאן להרשמה</a></p>
+    <% if (error) { %>
+    <p style="color: red"><%= error %></p>
+    <% } %>
+
+    <form class="login-form" action="/supplier/login" method="POST">
+      <input type="text" name="companyName" placeholder="שם חברה" required />
+      <input type="text" name="phone" placeholder="טלפון" required />
+      <button type="submit">התחבר</button>
+    </form>
+    <p>אין לך חשבון? <a href="/supplier/register">לחץ כאן להרשמה</a></p>
+  </body>
+</html>

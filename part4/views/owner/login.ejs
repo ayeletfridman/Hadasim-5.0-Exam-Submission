@@ -1,5 +1,20 @@
-<h2>כניסת בעל המכולת</h2>
-<form action="/owner/login" method="POST">
-  <input type="password" name="password" placeholder="סיסמה" required />
-  <button type="submit">התחבר</button>
-</form>
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>כניסת בעל המכולת</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h2>כניסת בעל המכולת</h2>
+
+    <% if (error) { %>
+    <p style="color: red"><%= error %></p>
+    <% } %>
+
+    <form action="/owner/login" method="POST">
+      <input type="password" name="password" placeholder="סיסמה" required />
+      <button type="submit">התחבר</button>
+    </form>
+  </body>
+</html>

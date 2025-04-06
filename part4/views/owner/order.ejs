@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>הזמנת סחורה</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <h1>הזמנת סחורה</h1>
+
+    <form action="/owner/order" method="POST">
+      <label for="supplierId">בחר ספק:</label>
+      <select
+        name="supplierId"
+        id="supplierId"
+        onchange="loadProducts(this.value)"
+      >
+        <option value="">בחר ספק</option>
+        <% suppliers.forEach(supplier => { %>
+        <option value="<%= supplier.id %>"><%= supplier.companyName %></option>
+        <% }) %>
+      </select>
+
+      <div id="products-container" style="display: none">
+        <h3>בחר מוצרים:</h3>
+        <div id="products-list"></div>
+      </div>
+
+      <button type="submit">בצע הזמנה</button>
+    </form>
+
+    <script>
+      function loadProducts(supplierId) {
+        if (supplierId) {
+          fetch(`/owner/products?supplierId=${supplierId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              const productsList = document.getElementById("products-list");
+              productsList.innerHTML = "";
+              data.forEach((product, index) => {
+                productsList.innerHTML += `
+                    <div>
+                      <input type="hidden" name="products[${index}][productId]" value="${product.productId}">
+                      <input type="number" name="products[${index}][quantity]" value = "1" min="${product.minQuantity}" placeholder="כמות" min="1" required>
+                      ${product.productName} - מחיר: ₪${product.price} - מינימום: ${product.minQuantity}
+                    </div>
+                  `;
+              });
+              document.getElementById("products-container").style.display =
+                "block";
+            });
+        } else {
+          document.getElementById("products-container").style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>
