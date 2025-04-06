@@ -1,7 +1,5 @@
-const sql = require("mssql");
-const dbConfig = require("../config/database");
-
-const OWNER_PASSWORD = "1234"; // הסיסמה שאתה רוצה לבדוק מולה
+// OwnerController.js
+const OwnerModel = require("../models/owner");
 
 // הצגת דף התחברות
 exports.loginPage = (req, res) => {
@@ -12,11 +10,9 @@ exports.loginPage = (req, res) => {
 exports.login = (req, res) => {
   const { password } = req.body;
 
-  if (password === OWNER_PASSWORD) {
-    // כניסה מוצלחת
+  if (password === OwnerModel.getOwnerPassword()) {
     res.redirect("/owner/dashboard");
   } else {
-    // סיסמה שגויה
     res.render("owner/login", { error: "סיסמה שגויה, נסה שוב." });
   }
 };
@@ -29,10 +25,9 @@ exports.dashboard = (req, res) => {
 // הצגת דף יצירת הזמנה
 exports.showOrderPage = async (req, res) => {
   try {
-    const result = await sql.query("SELECT * FROM Suppliers");
-    res.render("owner/order", { suppliers: result.recordset });
+    const suppliers = await OwnerModel.getSuppliers();
+    res.render("owner/order", { suppliers });
   } catch (error) {
-    console.error("שגיאה בהבאת ספקים:", error);
     res.status(500).send("שגיאה בהבאת ספקים");
   }
 };
@@ -40,34 +35,11 @@ exports.showOrderPage = async (req, res) => {
 // יצירת הזמנה
 exports.createOrder = async (req, res) => {
   const { supplierId, products } = req.body;
-  console.log(req.body);
 
   try {
-    const pool = await sql.connect(dbConfig);
-
-    // עבור כל מוצר
-    for (let product of products) {
-      const parsedProductId = parseInt(product.productId);
-      const parsedQuantity = parseInt(product.quantity);
-
-      console.log({ parsedProductId, parsedQuantity });
-
-      const request = pool.request();
-      request.input("supplierId", sql.Int, supplierId);
-      request.input("productId", sql.Int, parsedProductId);
-      request.input("quantity", sql.Int, parsedQuantity);
-      request.input("status", sql.NVarChar, "בתהליך");
-      request.input("orderDate", sql.DateTime, new Date());
-
-      await request.query(`
-            INSERT INTO Orders (supplierId, productId, quantity, status, orderDate)
-            VALUES (@supplierId, @productId, @quantity, @status, @orderDate)
-          `);
-    }
-
+    await OwnerModel.createOrder(supplierId, products);
     res.redirect("/owner/orders");
   } catch (error) {
-    console.error("שגיאה ביצירת הזמנה:", error);
     res.status(500).send("שגיאה ביצירת הזמנה");
   }
 };
@@ -77,13 +49,9 @@ exports.getProductsForSupplier = async (req, res) => {
   const { supplierId } = req.query;
 
   try {
-    const result = await sql.query(`
-      SELECT * FROM Products WHERE supplierId = ${supplierId}
-    `);
-
-    res.json(result.recordset); // מחזיר את המוצרים כ־JSON
+    const products = await OwnerModel.getProductsForSupplier(supplierId);
+    res.json(products);
   } catch (error) {
-    console.error("שגיאה בהבאת מוצרים:", error);
     res.status(500).send("שגיאה בהבאת מוצרים");
   }
 };
@@ -91,24 +59,9 @@ exports.getProductsForSupplier = async (req, res) => {
 // הצגת כל ההזמנות (כולל כאלה שהושלמו)
 exports.showAllOrders = async (req, res) => {
   try {
-    const pool = await sql.connect(dbConfig);
-    const result = await pool.request().query(`
-        SELECT 
-          Orders.id,
-          Orders.quantity,
-          Orders.status,
-          Orders.orderDate,
-          Suppliers.companyName,
-          Products.productName
-        FROM Orders
-        JOIN Suppliers ON Orders.supplierId = Suppliers.id
-        JOIN Products ON Orders.productId = Products.productId
-        ORDER BY Orders.orderDate DESC
-      `);
-
-    res.render("owner/orders", { orders: result.recordset });
+    const orders = await OwnerModel.getAllOrders();
+    res.render("owner/orders", { orders });
   } catch (error) {
-    console.error("שגיאה בשליפת ההזמנות:", error);
     res.status(500).send("שגיאה בשליפת ההזמנות");
   }
 };
@@ -118,16 +71,9 @@ exports.markOrderAsCompleted = async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    const pool = await sql.connect(dbConfig);
-    await pool.request().input("orderId", sql.Int, orderId).query(`
-          UPDATE Orders
-          SET status = N'הושלמה'
-          WHERE id = @orderId
-        `);
-
+    await OwnerModel.markOrderAsCompleted(orderId);
     res.redirect("/owner/orders");
   } catch (error) {
-    console.error("שגיאה בעדכון סטטוס ההזמנה:", error);
     res.status(500).send("שגיאה בעדכון סטטוס ההזמנה");
   }
 };
