@@ -41,7 +41,7 @@
                 productsList.innerHTML += `
                     <div>
                       <input type="hidden" name="products[${index}][productId]" value="${product.productId}">
-                      <input type="number" name="products[${index}][quantity]" value = "1" min="${product.minQuantity}" placeholder="כמות" min="1" required>
+                      <input type="number" name="products[${index}][quantity]" min="${product.minQuantity}" placeholder="כמות">
                       ${product.productName} - מחיר: ₪${product.price} - מינימום: ${product.minQuantity}
                     </div>
                   `;

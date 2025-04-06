@@ -26,17 +26,19 @@ exports.createOrder = async (supplierId, products) => {
       const parsedProductId = parseInt(product.productId);
       const parsedQuantity = parseInt(product.quantity);
 
-      const request = pool.request();
-      request.input("supplierId", sql.Int, supplierId);
-      request.input("productId", sql.Int, parsedProductId);
-      request.input("quantity", sql.Int, parsedQuantity);
-      request.input("status", sql.NVarChar, "בתהליך");
-      request.input("orderDate", sql.DateTime, new Date());
+      if (!isNaN(parsedQuantity) && parsedQuantity > 0) {
+        const request = pool.request();
+        request.input("supplierId", sql.Int, supplierId);
+        request.input("productId", sql.Int, parsedProductId);
+        request.input("quantity", sql.Int, parsedQuantity);
+        request.input("status", sql.NVarChar, "בתהליך");
+        request.input("orderDate", sql.DateTime, new Date());
 
-      await request.query(`
+        await request.query(`
         INSERT INTO Orders (supplierId, productId, quantity, status, orderDate)
         VALUES (@supplierId, @productId, @quantity, @status, @orderDate)
       `);
+      }
     }
   } catch (error) {
     console.error("שגיאה ביצירת הזמנה:", error);
