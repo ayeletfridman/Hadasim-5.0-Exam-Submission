@@ -10,6 +10,20 @@ SELECT p.Person_Id, p.Mother_Id, 'אם'
 FROM persons p
 WHERE p.Mother_Id IS NOT NULL;
 
+-- add child relationship
+INSERT INTO family_tree (Person_Id, Relative_Id, Connection_Type)
+SELECT p.Father_Id, p.Person_Id,
+       CASE WHEN p.Gender = 'זכר' THEN 'בן' ELSE 'בת' END
+FROM persons p
+WHERE p.Father_Id IS NOT NULL
+
+UNION ALL
+
+SELECT p.Mother_Id, p.Person_Id,
+       CASE WHEN p.Gender = 'זכר' THEN 'בן' ELSE 'בת' END
+FROM persons p
+WHERE p.Mother_Id IS NOT NULL;
+
 -- add brother/sister relationship
 INSERT INTO family_tree (Person_Id, Relative_Id, Connection_Type)
 SELECT c1.Person_Id, c2.Person_Id, 
