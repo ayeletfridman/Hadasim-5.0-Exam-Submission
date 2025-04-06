@@ -2,7 +2,7 @@
 const sql = require("mssql");
 const dbConfig = require("../config/database");
 
-const OWNER_PASSWORD = "1234"; // הסיסמה שאתה רוצה לבדוק מולה
+const OWNER_PASSWORD = "1234";
 
 exports.getOwnerPassword = () => {
   return OWNER_PASSWORD;
@@ -31,7 +31,7 @@ exports.createOrder = async (supplierId, products) => {
         request.input("supplierId", sql.Int, supplierId);
         request.input("productId", sql.Int, parsedProductId);
         request.input("quantity", sql.Int, parsedQuantity);
-        request.input("status", sql.NVarChar, "בתהליך");
+        request.input("status", sql.NVarChar, "בהמתנה");
         request.input("orderDate", sql.DateTime, new Date());
 
         await request.query(`

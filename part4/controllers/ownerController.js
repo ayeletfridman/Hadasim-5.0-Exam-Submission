@@ -1,12 +1,9 @@
-// OwnerController.js
 const OwnerModel = require("../models/owner");
 
-// הצגת דף התחברות
 exports.loginPage = (req, res) => {
   res.render("owner/login", { error: null });
 };
 
-// התחברות
 exports.login = (req, res) => {
   const { password } = req.body;
 
@@ -17,12 +14,10 @@ exports.login = (req, res) => {
   }
 };
 
-// דשבורד
 exports.dashboard = (req, res) => {
   res.render("owner/dashboard");
 };
 
-// הצגת דף יצירת הזמנה
 exports.showOrderPage = async (req, res) => {
   try {
     const suppliers = await OwnerModel.getSuppliers();
@@ -32,7 +27,6 @@ exports.showOrderPage = async (req, res) => {
   }
 };
 
-// יצירת הזמנה
 exports.createOrder = async (req, res) => {
   const { supplierId, products } = req.body;
 
@@ -44,7 +38,6 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-// פונקציה לשליפת המוצרים של ספק
 exports.getProductsForSupplier = async (req, res) => {
   const { supplierId } = req.query;
 
@@ -56,7 +49,6 @@ exports.getProductsForSupplier = async (req, res) => {
   }
 };
 
-// הצגת כל ההזמנות (כולל כאלה שהושלמו)
 exports.showAllOrders = async (req, res) => {
   try {
     const orders = await OwnerModel.getAllOrders();
@@ -66,7 +58,6 @@ exports.showAllOrders = async (req, res) => {
   }
 };
 
-// שינוי סטטוס של הזמנה ל"הושלמה"
 exports.markOrderAsCompleted = async (req, res) => {
   const { orderId } = req.params;
 

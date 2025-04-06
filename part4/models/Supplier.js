@@ -54,12 +54,14 @@ exports.getOrdersBySupplierId = async (supplierId) => {
 
 exports.updateOrderStatus = async (orderId, status) => {
   try {
-    await sql.query(
-      `
-      UPDATE Orders SET status = @status WHERE id = @orderId
-    `,
-      { orderId: orderId, status: status }
-    );
+    const pool = await sql.connect();
+
+    await pool
+      .request()
+      .input("status", sql.NVarChar, status)
+      .input("orderId", sql.Int, orderId).query(`
+        UPDATE Orders SET status = @status WHERE id = @orderId
+      `);
   } catch (error) {
     console.error("שגיאה בעדכון סטטוס ההזמנה:", error);
     throw error;

@@ -4,14 +4,13 @@ const sqlConfig = {
   user: "ayfridma_SQLLogin_1",
   password: "h1qnrxfoqk",
   database: "shoppingdb",
-  server: "shoppingdb.mssql.somee.com", // ודאי שזו מחרוזת תקינה
+  server: "shoppingdb.mssql.somee.com",
   options: {
-    encrypt: true, // חיבור מאובטח
-    trustServerCertificate: true, // חובה ל-Somee
+    encrypt: true,
+    trustServerCertificate: true,
   },
 };
 
-// פונקציה להתחברות למסד הנתונים
 async function connectDB() {
   try {
     await sql.connect(sqlConfig);

@@ -6,12 +6,19 @@
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <h1>ההזמנות של ספק <%= companyName %></h1>
+    <h1>ההזמנות שלי</h1>
+
+    <select id="statusFilter">
+      <option value="">הצג הכל</option>
+      <option value="בתהליך">בתהליך</option>
+      <option value="הושלמה">הושלמה</option>
+      <option value="בהמתנה">בהמתנה</option>
+    </select>
 
     <% if (orders.length === 0) { %>
-    <p>אין הזמנות לספק הזה.</p>
+    <p>אין לך הזמנות.</p>
     <% } else { %>
-    <table>
+    <table id="ordersTable">
       <thead>
         <tr>
           <th>מספר הזמנה</th>
@@ -19,16 +26,27 @@
           <th>תאריך</th>
           <th>כמות</th>
           <th>מוצר</th>
+          <th>פעולות</th>
         </tr>
       </thead>
       <tbody>
         <% orders.forEach(order => { %>
-        <tr>
+        <tr class="orderRow" data-status="<%= order.status %>">
           <td><%= order.id %></td>
           <td><%= order.status %></td>
           <td><%= order.orderDate %></td>
           <td><%= order.quantity %></td>
           <td><%= order.productName %></td>
+          <td>
+            <% if (order.status === 'בהמתנה') { %>
+            <form
+              action="/supplier/orders/<%= order.id %>/approve"
+              method="POST"
+            >
+              <button type="submit">אשר הזמנה</button>
+            </form>
+            <% } %>
+          </td>
         </tr>
         <% }) %>
       </tbody>
@@ -36,5 +54,23 @@
     <% } %>
 
     <a href="/supplier/dashboard">חזור לדשבורד</a>
+
+    <script>
+      const statusFilter = document.getElementById("statusFilter");
+      const orderRows = document.querySelectorAll(".orderRow");
+
+      statusFilter.addEventListener("change", function () {
+        const selectedStatus = this.value;
+
+        orderRows.forEach((row) => {
+          const rowStatus = row.dataset.status;
+          if (selectedStatus === "" || selectedStatus === rowStatus) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      });
+    </script>
   </body>
 </html>

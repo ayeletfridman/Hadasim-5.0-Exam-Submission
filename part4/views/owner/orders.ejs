@@ -8,10 +8,17 @@
   <body>
     <h1>צפייה בהזמנות</h1>
 
+    <select id="statusFilter">
+      <option value="">הצג הכל</option>
+      <option value="בתהליך">בתהליך</option>
+      <option value="הושלמה">הושלמה</option>
+      <option value="בהמתנה">בהמתנה</option>
+    </select>
+
     <% if (orders.length === 0) { %>
     <p>אין הזמנות להצגה.</p>
     <% } else { %>
-    <table border="1" cellpadding="10">
+    <table border="1" cellpadding="10" id="ordersTable">
       <thead>
         <tr>
           <th>מספר הזמנה</th>
@@ -25,15 +32,20 @@
       </thead>
       <tbody>
         <% orders.forEach(order => { %>
-        <tr>
+        <tr class="orderRow" data-status="<%= order.status %>">
           <td><%= order.id %></td>
           <td><%= order.companyName %></td>
           <td><%= order.productName %></td>
           <td><%= order.quantity %></td>
-          <td><%= order.status %></td>
+          <td>
+            <% if (order.status === 'בתהליך') { %> בתהליך <% } else if
+            (order.status === 'הושלמה') { %> הושלמה <% } else if (order.status
+            === 'בהמתנה') { %> בהמתנה <% } %>
+          </td>
           <td><%= new Date(order.orderDate).toLocaleString() %></td>
           <td>
-            <% if (order.status === 'בתהליך') { %>
+            <% if (order.status === 'בהמתנה') { %> מחכה לאישור <% } else if
+            (order.status === 'בתהליך') { %>
             <form action="/owner/orders/complete/<%= order.id %>" method="POST">
               <button type="submit">אשר קבלה</button>
             </form>
@@ -49,5 +61,23 @@
 
     <br />
     <a href="/owner/dashboard">חזרה לדשבורד</a>
+
+    <script>
+      const statusFilter = document.getElementById("statusFilter");
+      const orderRows = document.querySelectorAll(".orderRow");
+
+      statusFilter.addEventListener("change", function () {
+        const selectedStatus = this.value;
+
+        orderRows.forEach((row) => {
+          const rowStatus = row.dataset.status;
+          if (selectedStatus === "" || selectedStatus === rowStatus) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      });
+    </script>
   </body>
 </html>

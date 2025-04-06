@@ -7,9 +7,9 @@
   </head>
   <body>
     <div class="container">
-      <h1>ברוך הבא לדשבורד הספק</h1>
+      <h1>ברוכים הבאים <strong><%= companyName %></strong>!</h1>
 
-      <p>שלום חברת <strong><%= companyName %></strong>!</p>
+      <p>בחר פעולה</p>
 
       <div class="actions">
         <form action="/supplier/orders" method="GET">
@@ -19,9 +19,11 @@
         </form>
       </div>
 
-      <form action="/" method="GET">
-        <button type="submit">התנתק</button>
-      </form>
+      <div class="actions">
+        <form action="/" method="GET">
+          <button type="submit" class="navigate">התנתק</button>
+        </form>
+      </div>
     </div>
   </body>
 </html>

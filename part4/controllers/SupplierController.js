@@ -1,13 +1,10 @@
-// SupplierController.js
 const SupplierModel = require("../models/Supplier");
 
 const SupplierController = {
-  // הצגת דף התחברות לספקים
   showLoginPage: (req, res) => {
     res.render("supplier/login", { error: null });
   },
 
-  // התחברות ספק
   login: async (req, res) => {
     const { companyName, phone } = req.body;
 
@@ -36,7 +33,6 @@ const SupplierController = {
     }
   },
 
-  // הצגת רשימת ההזמנות של הספק
   viewOrders: async (req, res) => {
     const { supplierId, companyName } = req.query;
 
@@ -54,7 +50,6 @@ const SupplierController = {
     }
   },
 
-  // אישור הזמנה ע"י ספק
   approveOrder: async (req, res) => {
     const orderId = req.params.id;
 

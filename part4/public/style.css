@@ -169,4 +169,46 @@ li:last-child {
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  text-align: center;
+}
+
+/* כפתורים בעמוד הראשי */
+.main-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.main-buttons button {
+  background-color: #45a049;
+  color: white;
+  padding: 15px 30px;
+  font-size: 18px;
+  border-radius: 8px;
+}
+
+.main-buttons button:hover {
+  background-color: #45a049;
+}
+
+/* עיצוב עבור כפתורים בעמוד דשבורד ספק */
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.actions form {
+  margin: 0; /* הסרת השוליים מה-form */
+}
+
+.actions button {
+  margin: 0; /* הסרת השוליים מהכפתור */
+}
+
+/* עיצוב עבור כפתור התנתקות */
+.container form:last-child {
+  text-align: center;
+  margin-top: 20px;
 }
