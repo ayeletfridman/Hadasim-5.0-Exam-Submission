@@ -62,12 +62,10 @@ const SupplierController = {
     }
   },
 
-  // הצגת דף הרשמה לספק
   showRegisterPage: (req, res) => {
     res.render("supplier/register");
   },
 
-  // שמירת הספק למסד הנתונים
   registerSupplier: async (req, res) => {
     const { companyName, phone, representative } = req.body;
     const products = {
