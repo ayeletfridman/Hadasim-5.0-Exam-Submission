@@ -14,9 +14,9 @@ const sqlConfig = {
 async function connectDB() {
   try {
     await sql.connect(sqlConfig);
-    console.log("✅ התחברות מוצלחת למסד הנתונים!");
+    console.log(" התחברות מוצלחת למסד הנתונים!");
   } catch (error) {
-    console.error("❌ שגיאה בחיבור למסד הנתונים:", error);
+    console.error(" שגיאה בחיבור למסד הנתונים:", error);
   }
 }
 

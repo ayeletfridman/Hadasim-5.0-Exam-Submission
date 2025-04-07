@@ -33,18 +33,15 @@
         <% orders.forEach(order => { %>
         <tr class="orderRow" data-status="<%= order.status %>">
           <td><%= order.id %></td>
-          <td><%= order.status %></td>
+          <td class="status"><%= order.status %></td>
           <td><%= order.orderDate %></td>
           <td><%= order.quantity %></td>
           <td><%= order.productName %></td>
           <td>
             <% if (order.status === 'בהמתנה') { %>
-            <form
-              action="/supplier/orders/<%= order.id %>/approve"
-              method="POST"
-            >
-              <button type="submit">אשר הזמנה</button>
-            </form>
+            <button class="approveButton" data-order-id="<%= order.id %>">
+              אשר הזמנה
+            </button>
             <% } %>
           </td>
         </tr>
@@ -53,11 +50,10 @@
     </table>
     <% } %>
 
-    <a href="/supplier/dashboard">חזור לדשבורד</a>
-
     <script>
       const statusFilter = document.getElementById("statusFilter");
       const orderRows = document.querySelectorAll(".orderRow");
+      const approveButtons = document.querySelectorAll(".approveButton");
 
       statusFilter.addEventListener("change", function () {
         const selectedStatus = this.value;
@@ -68,6 +64,34 @@
             row.style.display = "";
           } else {
             row.style.display = "none";
+          }
+        });
+      });
+
+      approveButtons.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+          const orderId = event.target.dataset.orderId;
+          const row = event.target.closest(".orderRow");
+          const statusCell = row.querySelector(".status");
+
+          try {
+            const response = await fetch(
+              `/supplier/orders/${orderId}/approve`,
+              {
+                method: "POST",
+              }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              statusCell.textContent = data.status;
+              row.dataset.status = data.status;
+              event.target.remove();
+            } else {
+              console.error("שגיאה בעדכון סטטוס ההזמנה");
+            }
+          } catch (error) {
+            console.error("שגיאה בעדכון סטטוס ההזמנה:", error);
           }
         });
       });

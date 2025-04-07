@@ -13,23 +13,19 @@ def load_data(file_path):
         print(f"Error loading data: {e}")
         exit()
 
-def clean_data(df):
-   
+def clean_data(df):   
     # Remove duplicate rows
     duplicates = df.duplicated().sum()
     if duplicates > 0:
         print(f"Found {duplicates} duplicate rows. Removing them...")
-        df = df.drop_duplicates()
-    
+        df = df.drop_duplicates()   
     # Remove missing values
     missing_values = df.isnull().sum()
     if missing_values.any():
         print("Found missing values, removing them...")
         df = df.dropna()
-
      # Remove rows with non-numeric values in the 'value' column
-    df = df[pd.to_numeric(df['value'], errors='coerce').notna()]
-    
+    df = df[pd.to_numeric(df['value'], errors='coerce').notna()]    
     return df
 
 def compute_hourly_average(df):

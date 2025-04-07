@@ -13,7 +13,7 @@ WHERE p.Mother_Id IS NOT NULL;
 -- add child relationship
 INSERT INTO family_tree (Person_Id, Relative_Id, Connection_Type)
 SELECT p.Father_Id, p.Person_Id,
-       CASE WHEN p.Gender = 'זכר' THEN 'בן' ELSE 'בת' END
+       CASE WHEN p.Gender = 'זכר' THEN 'בן' ELSE 'בת' END --choose the connection in order ro the gender
 FROM persons p
 WHERE p.Father_Id IS NOT NULL
 
@@ -27,14 +27,14 @@ WHERE p.Mother_Id IS NOT NULL;
 -- add brother/sister relationship
 INSERT INTO family_tree (Person_Id, Relative_Id, Connection_Type)
 SELECT c1.Person_Id, c2.Person_Id, 
-       CASE WHEN c1.Gender = 'זכר' THEN 'אח' ELSE 'אחות' END
+       CASE WHEN c1.Gender = 'זכר' THEN 'אח' ELSE 'אחות' END --choose the connection in order ro the gender
 FROM persons c1
-JOIN persons c2 ON c1.Father_Id = c2.Father_Id OR c1.Mother_Id = c2.Mother_Id
-WHERE c1.Person_Id <> c2.Person_Id;
+JOIN persons c2 ON c1.Father_Id = c2.Father_Id OR c1.Mother_Id = c2.Mother_Id --same father or mother
+WHERE c1.Person_Id <> c2.Person_Id; --not the same person
 
 -- add boyfriend/girlfriend relationship
 INSERT INTO family_tree (Person_Id, Relative_Id, Connection_Type)
 SELECT p.Person_Id, p.Spouse_Id, 
-       CASE WHEN p.Gender = 'זכר' THEN 'בן זוג' ELSE 'בת זוג' END
+       CASE WHEN p.Gender = 'זכר' THEN 'בן זוג' ELSE 'בת זוג' END --choose the connection in order ro the gender
 FROM persons p
 WHERE p.Spouse_Id IS NOT NULL;

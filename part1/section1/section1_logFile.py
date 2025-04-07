@@ -3,21 +3,18 @@ import re
 from collections import Counter
 import heapq
 
-def read_log_file(input_file):
+def read_and_extract_errors(input_file):
+    errors = []
     try:
-        df = pd.read_excel(input_file, header=None)  # read the excel file
-        return df[0].astype(str).tolist()  # turn each row from the file into a list
+        df = pd.read_excel(input_file, header=None) 
+        for line in df[0].astype(str):  # read each row as text
+            match = re.search(r"Error: (\S+)", line)
+            if match:
+                errors.append(match.group(1)) #add the rows with error
     except Exception as e:
         print(f"Error reading file: {e}")
-        return []
-
-def extract_errors(log_lines):
-    errors = []
-    for line in log_lines:
-        match = re.search(r"Error: (\S+)", line) #look for the code in eavh row
-        if match:
-            errors.append(match.group(1)) #add the error code
     return errors
+
 
 def split_log_data(errors, lines_per_chunk=100000):
     chunk_count = 0
@@ -46,21 +43,26 @@ def merge_counters(chunk_count):
         global_counter.update(chunk_counter) #merge all the errors in the split files together
     return global_counter
 
-def get_top_n_errors(global_counter, N):
-    return heapq.nlargest(N, global_counter.items(), key=lambda x: x[1]) #return the N most current errors by their bumber - x[1]
-
 def process_log_file(input_file, N):
-    log_lines = read_log_file(input_file)
-    if not log_lines:
+    errors = read_and_extract_errors(input_file)
+    if not errors:
         return
-    errors = extract_errors(log_lines)
     chunk_count = split_log_data(errors)
     global_counter = merge_counters(chunk_count)
-    top_n_errors = get_top_n_errors(global_counter, N)
-    for error_code, count in top_n_errors:
+    top_n = heapq.nlargest(N, global_counter.items(), key=lambda x: x[1])
+    for error_code, count in top_n:
         print(f'{error_code}: {count}')
 
 if __name__ == "__main__":
     input_file = "logs.txt.xlsx" 
     N = 2 
     process_log_file(input_file, N)
+
+
+# סיבוכיות הזמן : O(Mlog(N)) - 
+# M - מספר השורות בקובץ
+# N - מספר השגיאות המובילות שצריך להחזיר
+
+# סיבוכיות המקום : O(M + U) - 
+# M - מספר השורות בקובץ
+# U - מספר סוגי השגיאות

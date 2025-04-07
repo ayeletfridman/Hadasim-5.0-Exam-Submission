@@ -13,26 +13,22 @@ def load_data(file_path):
         print(f"Error loading data: {e}")
         exit()
 
-def clean_data(df):
-    
+def clean_data(df):    
     # Remove duplicate rows
     duplicates = df.duplicated().sum()
     if duplicates > 0:
         print(f"Found {duplicates} duplicate rows. Removing them...")
-        df = df.drop_duplicates()
-    
+        df = df.drop_duplicates()    
     # Remove missing values
     missing_values = df.isnull().sum()
     if missing_values.any():
         print("Found missing values, removing them...")
         df = df.dropna()
-
      # Remove rows where 'value' is not a numeric value
-    df = df[pd.to_numeric(df['value'], errors='coerce').notna()]
-    
+    df = df[pd.to_numeric(df['value'], errors='coerce').notna()]    
     return df
 
-def split_data_by_day(df):
+def split_data_by_day(df): #new for this section
     # Split data into separate files for each day
     df['Date'] = df['timestamp'].dt.date
     unique_dates = df['Date'].unique()
@@ -41,14 +37,7 @@ def split_data_by_day(df):
         daily_data.to_csv(f"data_{date}.csv", index=False)
     return unique_dates
 
-def compute_hourly_average(df):
-    # Compute hourly average of 'value' column
-    df['Hour'] = df['timestamp'].dt.floor('h')  # Round timestamps down to the nearest hour
-    hourly_avg = df.groupby('Hour')['value'].mean().reset_index()  # Group by hour and compute average
-    hourly_avg.columns = ['Timestamp', 'Average']  # Rename columns
-    return hourly_avg
-
-def process_daily_files(dates):
+def process_daily_files(dates): #new for this section
     # Compute hourly averages for each daily file and merge results
     all_data = []
     for date in dates:
@@ -59,6 +48,13 @@ def process_daily_files(dates):
     
     final_df = pd.concat(all_data).sort_values(by='Timestamp')
     return final_df
+
+def compute_hourly_average(df):
+    # Compute hourly average of 'value' column
+    df['Hour'] = df['timestamp'].dt.floor('h')  # Round timestamps down to the nearest hour
+    hourly_avg = df.groupby('Hour')['value'].mean().reset_index()  # Group by hour and compute average
+    hourly_avg.columns = ['Timestamp', 'Average']  # Rename columns
+    return hourly_avg
 
 def save_data(df, output_file):
     # Save processed data to a CSV file

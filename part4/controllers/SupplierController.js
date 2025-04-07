@@ -55,7 +55,7 @@ const SupplierController = {
 
     try {
       await SupplierModel.updateOrderStatus(orderId, "בתהליך");
-      res.send(`הזמנה ${orderId} אושרה בהצלחה`);
+      res.json({ status: "בתהליך" });
     } catch (error) {
       console.error("שגיאה בעדכון סטטוס ההזמנה:", error);
       res.status(500).send("שגיאה בעדכון סטטוס ההזמנה");

@@ -47,7 +47,7 @@
             <% if (order.status === 'בהמתנה') { %> מחכה לאישור <% } else if
             (order.status === 'בתהליך') { %>
             <form action="/owner/orders/complete/<%= order.id %>" method="POST">
-              <button type="submit">אשר קבלה</button>
+              <button type="submit" class="small-submit">אשר קבלה</button>
             </form>
             <% } else { %>
             <span>✔ הושלמה</span>
