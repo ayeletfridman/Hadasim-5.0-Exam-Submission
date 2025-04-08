@@ -1,4 +1,5 @@
 const OwnerModel = require("../models/owner");
+
 // Render login page
 exports.loginPage = (req, res) => {
   res.render("owner/login", { error: null });
