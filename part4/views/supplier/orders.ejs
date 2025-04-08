@@ -33,8 +33,19 @@
         <% orders.forEach(order => { %>
         <tr class="orderRow" data-status="<%= order.status %>">
           <td><%= order.id %></td>
-          <td class="status"><%= order.status %></td>
-          <td><%= order.orderDate %></td>
+          <td>
+            <span
+              class="status-badge <% if (order.status === 'בהמתנה') { %>pending<% } else if (order.status === 'בתהליך') { %>in-progress<% } else if (order.status === 'הושלמה') { %>complete<% } %>"
+            >
+              <%= order.status %>
+            </span>
+          </td>
+
+          <td>
+            <%= new Date(order.orderDate).toLocaleString('he-IL', { year:
+            'numeric', month: '2-digit', day: '2-digit', hour: '2-digit',
+            minute: '2-digit' }) %>
+          </td>
           <td><%= order.quantity %></td>
           <td><%= order.productName %></td>
           <td>
@@ -72,7 +83,7 @@
         button.addEventListener("click", async (event) => {
           const orderId = event.target.dataset.orderId;
           const row = event.target.closest(".orderRow");
-          const statusCell = row.querySelector(".status");
+          const statusCell = row.querySelector("td:nth-child(2) .status-badge");
 
           try {
             const response = await fetch(
@@ -84,8 +95,17 @@
 
             if (response.ok) {
               const data = await response.json();
+              // Update the status in the table immediately
               statusCell.textContent = data.status;
+              statusCell.className = `status-badge ${
+                data.status === "בהמתנה"
+                  ? "pending"
+                  : data.status === "בתהליך"
+                  ? "in-progress"
+                  : "complete"
+              }`;
               row.dataset.status = data.status;
+              // Remove the approve button
               event.target.remove();
             } else {
               console.error("שגיאה בעדכון סטטוס ההזמנה");

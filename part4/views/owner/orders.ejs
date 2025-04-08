@@ -38,10 +38,13 @@
           <td><%= order.productName %></td>
           <td><%= order.quantity %></td>
           <td>
-            <% if (order.status === 'בתהליך') { %> בתהליך <% } else if
-            (order.status === 'הושלמה') { %> הושלמה <% } else if (order.status
-            === 'בהמתנה') { %> בהמתנה <% } %>
+            <span
+              class="<% if (order.status === 'בהמתנה') { %>status-badge pending<% } else if (order.status === 'בתהליך') { %>status-badge in-progress<% } else if (order.status === 'הושלמה') { %>status-badge complete<% } %>"
+            >
+              <%= order.status %>
+            </span>
           </td>
+
           <td><%= new Date(order.orderDate).toLocaleString() %></td>
           <td>
             <% if (order.status === 'בהמתנה') { %> מחכה לאישור <% } else if

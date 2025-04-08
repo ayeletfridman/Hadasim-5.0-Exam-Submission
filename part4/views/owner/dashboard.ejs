@@ -4,34 +4,50 @@
     <meta charset="UTF-8" />
     <title>דשבורד בעל המכולת</title>
     <link rel="stylesheet" href="/style.css" />
+    <style>
+      .dashboard-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+      }
+
+      .dashboard-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #26a69a;
+        color: white;
+        text-decoration: none;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        text-align: center;
+        min-width: 180px;
+      }
+
+      .dashboard-button:hover {
+        background-color: #1e867c;
+      }
+
+      .logout-container {
+        text-align: center;
+        margin-top: 40px;
+      }
+    </style>
   </head>
   <body>
     <h1>ברוך הבא, בעל המכולת!</h1>
     <p>בחר פעולה:</p>
 
-    <ul style="list-style-type: none; padding: 0">
-      <li>
-        <a href="/owner/order" class="dashboard-link">הזמנת סחורה מספק</a>
-      </li>
-      <li>
-        <a href="/owner/orders" class="dashboard-link">צפייה בסטטוס הזמנות</a>
-      </li>
-    </ul>
+    <div class="dashboard-container">
+      <a href="/owner/order" class="dashboard-button">הזמנת סחורה מספק</a>
+      <a href="/owner/orders" class="dashboard-button">צפייה בסטטוס הזמנות</a>
+    </div>
 
-    <style>
-      .dashboard-link {
-        display: inline-block;
-        padding: 10px 15px;
-        margin: 8px 0;
-        background-color: #26a69a;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-      }
-
-      .dashboard-link:hover {
-        background-color: #26a69a;
-      }
-    </style>
+    <div class="logout-container">
+      <a href="/" class="dashboard-button">התנתק</a>
+    </div>
   </body>
 </html>

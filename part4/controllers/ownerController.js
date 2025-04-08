@@ -1,9 +1,10 @@
 const OwnerModel = require("../models/owner");
-
+// Render login page
 exports.loginPage = (req, res) => {
   res.render("owner/login", { error: null });
 };
 
+// Handle login logic
 exports.login = (req, res) => {
   const { password } = req.body;
 
@@ -14,10 +15,12 @@ exports.login = (req, res) => {
   }
 };
 
+// Render owner's dashboard
 exports.dashboard = (req, res) => {
   res.render("owner/dashboard");
 };
 
+// Show order creation page with list of suppliers
 exports.showOrderPage = async (req, res) => {
   try {
     const suppliers = await OwnerModel.getSuppliers();
@@ -27,6 +30,7 @@ exports.showOrderPage = async (req, res) => {
   }
 };
 
+// Handle order creation
 exports.createOrder = async (req, res) => {
   const { supplierId, products } = req.body;
 
@@ -38,6 +42,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Return products for a specific supplier (used via AJAX)
 exports.getProductsForSupplier = async (req, res) => {
   const { supplierId } = req.query;
 
@@ -49,6 +54,7 @@ exports.getProductsForSupplier = async (req, res) => {
   }
 };
 
+// Show all orders
 exports.showAllOrders = async (req, res) => {
   try {
     const orders = await OwnerModel.getAllOrders();
@@ -58,6 +64,7 @@ exports.showAllOrders = async (req, res) => {
   }
 };
 
+// Mark an order as completed
 exports.markOrderAsCompleted = async (req, res) => {
   const { orderId } = req.params;
 
